@@ -1,16 +1,28 @@
-const Validator = require('../validator/userValidator')
+const Validator = require('../validator/userValidator');
 
 module.exports = {
-    async createUser (req, res, next) {
+    async createUser(req, res, next) {
         try {
-            const { error } = Validator.createUser.validate(req.body)
+            const { error } = Validator.createUser.validate(req.body);
 
             if (error) {
                 throw new Error(error.details[0].message);
             }
-            await next()
-        }catch (e) {
-            res.json(e.message)
+            await next();
+        } catch (e) {
+            res.json(e.message);
+        }
+    },
+    async singIn(req, res, next) {
+        try {
+            const { error } = Validator.singIn.validate(req.body);
+
+            if (error) {
+                throw new Error(error.details[0].message);
+            }
+            await next();
+        } catch (e) {
+            res.json(e.message);
         }
     }
-}
+};
