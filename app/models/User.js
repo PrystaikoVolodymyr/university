@@ -11,7 +11,7 @@ const userSchema = new Schema({
             'student',
             'teacher'
         ],
-        required: true
+        // required: true
     },
     connections: [{ type: Schema.Types.ObjectId, ref: 'User' }]
 });
