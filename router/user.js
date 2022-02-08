@@ -4,6 +4,6 @@ const router = require('express').Router();
 const { userController } = require('../controller');
 const { userMiddleware } = require('../middleware');
 
-router.post('/sing-up', userMiddleware.createUser, userController.requestToConnect);
+// router.post('/connection-request', userMiddleware.createUser, userController.requestToConnect);
 
 module.exports = router;
