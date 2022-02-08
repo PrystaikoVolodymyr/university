@@ -2,10 +2,10 @@
   "name": "university",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "app/app.js",
   "scripts": {
-    "start": " node app.js",
-    "server": "nodemon app.js"
+    "start": " node app/app.js",
+    "server": "nodemon app/app.js"
   },
   "author": "Prystaiko Volodymyr <volodymyr.p445@gmail.com>",
   "license": "ISC",
