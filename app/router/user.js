@@ -7,5 +7,6 @@ const { userController } = require('../controller');
 router.get('/me', userController.getUserInfo);
 router.post('/connection-request', userController.sendRequestToConnect);
 router.post('/connection-approve', userController.approveConnectRequest);
+router.post('/connection-reject', userController.rejectConnectRequest);
 
 module.exports = router;

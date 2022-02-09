@@ -50,6 +50,9 @@ module.exports = {
             if (!user || !connectUser) {
                 throw new Error('No user');
             }
+            if (!user.requestConnections.includes(connectId) || !connectUser.sendConnections.includes(userId)) {
+                throw new Error('Connection didnt sent');
+            }
             await User.updateOne({
                 _id: userId
             },
@@ -62,10 +65,42 @@ module.exports = {
             },
             {
                 $push: { connections: userId },
-                $pull: { sendConnections: connectId }
+                $pull: { sendConnections: userId }
             });
 
             res.status(201).json({ message: 'Connected was successfully' });
+        } catch (e) {
+            res.json(e.message);
+        }
+    },
+    async rejectConnectRequest(req, res) {
+        try {
+            const { userId, connectId } = req.body;
+
+            const user = await User.findOne({ _id: userId });
+            const connectUser = await User.findOne({ _id: connectId });
+
+            if (!user.requestConnections.includes(connectId) || !connectUser.sendConnections.includes(userId)) {
+                throw new Error('Connection didnt sent');
+            }
+
+            if (!user || !connectUser) {
+                throw new Error('No user');
+            }
+            await User.updateOne({
+                _id: userId
+            },
+            {
+                $pull: { requestConnections: connectId }
+            });
+            await User.updateOne({
+                _id: connectId
+            },
+            {
+                $pull: { sendConnections: userId }
+            });
+
+            res.status(201).json({ message: 'Connected reject was successfully' });
         } catch (e) {
             res.json(e.message);
         }
