@@ -11,11 +11,10 @@ const userSchema = new Schema({
             'student',
             'teacher'
         ],
-        // required: true
     },
     connections: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     requestConnections: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     sendConnections: [{ type: Schema.Types.ObjectId, ref: 'User' }]
-});
+}, { timestamps: true });
 
 module.exports = model('User', userSchema);
