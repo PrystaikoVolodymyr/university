@@ -20,7 +20,7 @@ module.exports = {
             const connectUser = await User.findOne({ _id: connectId });
 
             if (!user || !connectUser) {
-                throw new Error('No user');
+                throw new Error('No User');
             }
             await User.updateOne({
                 _id: connectId
