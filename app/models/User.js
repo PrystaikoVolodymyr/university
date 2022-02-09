@@ -13,7 +13,9 @@ const userSchema = new Schema({
         ],
         // required: true
     },
-    connections: [{ type: Schema.Types.ObjectId, ref: 'User' }]
+    connections: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    requestConnections: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    sendConnections: [{ type: Schema.Types.ObjectId, ref: 'User' }]
 });
 
 module.exports = model('User', userSchema);
