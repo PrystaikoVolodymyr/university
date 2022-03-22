@@ -29,14 +29,15 @@ for (let i = 1; ;i++) {
         break;
     }
 }
-// console.log('p =', p);
-// console.log('q =', q);
-// console.log('n =', n);
-// console.log('f =', f);
-// console.log('d =', d);
-// console.log('e =', e);
-// console.log('ВІДКРИТИЙ КЛЮЧ', e, 'i', n);
-// console.log('ЗАКРИТИЙ КЛЮЧ', d, 'i', n);
+console.log('p =', p);
+console.log('q =', q);
+console.log('n =', n);
+console.log('f =', f);
+console.log('d =', d);
+console.log('e =', e);
+console.log(+'*');
+console.log('ВІДКРИТИЙ КЛЮЧ', e, 'i', n);
+console.log('ЗАКРИТИЙ КЛЮЧ', d, 'i', n);
 
 module.exports = {
      encryption(message) {
@@ -46,54 +47,28 @@ module.exports = {
 
         for (let letter of message) {
             let с;
-            if (alphabet.includes(letter)) {
                let i = alphabet.indexOf(letter)
                 с = (i ** d) % n;
                 coder.push(с);
-            }else {
-                coder.push(letter)
-            }
         }
+        let encrypted = coder.join(' ');
 
-        let encrypted = [];
-
-        for (const coderElement of coder) {
-            if (typeof coderElement === "number") {
-                encrypted.push(alphabet[coderElement])
-            } else {
-                encrypted.push(coderElement)
-            }
-        }
-        return encrypted.join('');
+        return encrypted
 
     },
 
      decryption(message) {
-        let decrypted = [];
-        let coder = [];
+         let decrypted = [];
 
-        message = message.split('');
-
-        for (let letter of message) {
-            if (alphabet.includes(letter)) {
-                coder.push(alphabet.indexOf(letter));
-            }else {
-                coder.push(letter)
-            }
-        }
+         let coder = message.split(' ');
 
         for (const coderElement of coder) {
-            let m;
-            if (typeof coderElement === "number") {
-                const z = (BigInt(coderElement) ** BigInt(e));
+                let m;
+                const z = (BigInt(+coderElement) ** BigInt(e));
                 m = BigInt(z) % BigInt(n);
                 decrypted.push(alphabet[m]);
-            } else {
-                decrypted.push(coderElement);
-            }
-
         }
 
         return decrypted.join('')
-    }
+     }
 }
