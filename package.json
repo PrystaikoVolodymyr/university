@@ -12,9 +12,11 @@
   "dependencies": {
     "bcrypt": "^5.0.1",
     "config": "^3.3.7",
+    "cors": "^2.8.5",
     "express": "^4.17.2",
     "joi": "^17.5.0",
     "mongoose": "^6.1.7",
+    "nodemailer": "^6.7.3",
     "twilio": "^3.75.1"
   },
   "devDependencies": {
