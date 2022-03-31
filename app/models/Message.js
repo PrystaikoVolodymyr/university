@@ -1,5 +1,4 @@
 const { Schema, model } = require('mongoose');
-const encoder = require('../scripts/encoder');
 
 const messageSchema = new Schema({
     senderId: { type: Schema.Types.ObjectId, ref: 'User' },
