@@ -2,6 +2,9 @@ const User = require('../models/User');
 const bcrypt = require('../crypto/bcrypt');
 const TwoFactorAuth = require('../models/twoFactorAuth')
 const nodemailer = require('../lib/nodemailer')
+const tokenGenerator = require('../lib/tokenGenerator')
+const jwt = require('jsonwebtoken');
+const config = require('config');
 
 module.exports = {
     async singUp(req, res) {
@@ -34,7 +37,6 @@ module.exports = {
 
             if (!user) {
                 throw new Error('no user')
-                return res.status(400).json({ message: 'Wrong email or password' });
             }
 
             await bcrypt.compare(password, user.password);
@@ -44,8 +46,12 @@ module.exports = {
                 code: code,
             })
 
+            const token = await tokenGenerator.generateToken(email)
+
              await nodemailer.sendMail('TwoFactorAuth', code, email)
-            res.status(201).json({ message: 'Login is complete' });
+
+            return res.status(201).json({ message: 'Login is complete', token:  token});
+
         } catch (e) {
             res.status(400).json({message: e.message});
         }
@@ -53,15 +59,26 @@ module.exports = {
 
     async verifyTwoFactorAuth(req, res) {
         try {
-            const { email, code} = req.body;
+            const { code } = req.body;
 
-            const verify = await TwoFactorAuth.findOne({email: email, code: code})
+            const token = req.headers.token
+
+            const info = jwt.verify(token, config.Token_key, {},(err, info) => {
+                if (err)  {
+                    throw new Error('wrong token')
+                }
+                return info
+            })
+
+            const verify = await TwoFactorAuth.findOne({email: info.userInfo, code: code})
 
             if (!verify) {
                 throw new Error('not valid code')
             }
 
-            res.status(201).json({ message: 'Verify is complete' });
+            const tokens = tokenGenerator.generateAccessAndRefreshToken()
+
+            res.status(201).json({ message: 'Verify is complete', tokens });
         } catch (e) {
             res.status(400).json(e.message);
         }

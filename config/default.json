@@ -1,4 +1,7 @@
 {
     "port" : 5000,
-    "mongoURI": "mongodb+srv://volodymyr:23.09.2001@cluster0.jsvlv.mongodb.net/app?retryWrites=true&w=majority"
+    "mongoURI": "mongodb+srv://volodymyr:23.09.2001@cluster0.jsvlv.mongodb.net/app?retryWrites=true&w=majority",
+    "Access_Key": "9a240889789a32f500b9142bb32506b0dc3162e64a9be6d23415a729aabbff66",
+    "Refresh_Key": "7196a7d7ac20f1419249c21ade9bc8ef5a41e21034dac2e00df9f2c24b7fff5b",
+    "Token_key": "53ec0c07f995fe1d2068587ab6f696dbbb386e811faeb37530fbb85be56b3386"
 }
