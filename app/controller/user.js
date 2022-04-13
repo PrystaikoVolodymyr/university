@@ -3,11 +3,28 @@ const User = require('../models/User');
 module.exports = {
     async getUserInfo(req, res) {
         try {
-            const { userId } = req.body;
+            const { userId } = req.query;
 
             const user = await User.findOne({ _id: userId });
 
             res.json({ user, status: 'success' });
+        } catch (e) {
+            res.json(e.message);
+        }
+    },
+    async getUsers(req, res) {
+        try {
+            const {name, surname}  = req.query
+
+            let users
+            if ((name && surname) !== '') {
+                 users = await User.find({name: name, surname: surname});
+            }else if (name !== '' && surname === '') {
+                 users = await User.find({name: name});
+            } else if (surname !== '' && name === '') {
+                 users = await User.find({surname: surname});
+            }
+            res.status(201).json({ users: users});
         } catch (e) {
             res.json(e.message);
         }

@@ -27,8 +27,7 @@ async function start() {
             console.log(`App has been started at port ${PORT}...`);
         });
     } catch (e) {
-        console.log('Server Error mongoDB', e.message());
-        process.exit(1);
+        console.log('Server Error mongoDB', e.message);
     }
 }
 
