@@ -4,10 +4,13 @@ const config = require('config');
 const router = require('./router');
 const cors = require('cors')
 const app = express();
+const cookieParser = require('cookie-parser');
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors())
+app.use(cookieParser());
 
 app.use('/', router);
 
@@ -24,8 +27,7 @@ async function start() {
             console.log(`App has been started at port ${PORT}...`);
         });
     } catch (e) {
-        console.log('Server Error mongoDB', e.message());
-        process.exit(1);
+        console.log('Server Error mongoDB', e.message);
     }
 }
 

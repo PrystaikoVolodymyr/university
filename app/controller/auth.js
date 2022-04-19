@@ -2,11 +2,14 @@ const User = require('../models/User');
 const bcrypt = require('../crypto/bcrypt');
 const TwoFactorAuth = require('../models/twoFactorAuth')
 const nodemailer = require('../lib/nodemailer')
+const tokenGenerator = require('../lib/tokenGenerator')
+const jwt = require('jsonwebtoken');
+const config = require('config');
 
 module.exports = {
     async singUp(req, res) {
         try {
-            const { email, password, name } = req.body;
+            const { email, password, name, surname } = req.body;
             const user = await User.findOne({ email });
             if (user) {
                 return res.status(400).json({ message: 'User is already exist' });
@@ -16,7 +19,8 @@ module.exports = {
             await User.create({
                 email,
                 password: hashPassword,
-                name
+                name,
+                surname
             });
 
             res.status(201).json({ message: 'User is created' });
@@ -34,7 +38,6 @@ module.exports = {
 
             if (!user) {
                 throw new Error('no user')
-                return res.status(400).json({ message: 'Wrong email or password' });
             }
 
             await bcrypt.compare(password, user.password);
@@ -44,26 +47,62 @@ module.exports = {
                 code: code,
             })
 
+            const token = await tokenGenerator.generateToken({email: email, userId: user._id})
+
              await nodemailer.sendMail('TwoFactorAuth', code, email)
-            res.status(201).json({ message: 'Login is complete' });
+
+            return res.status(201).json({ message: 'Login is complete', token:  token});
+
         } catch (e) {
-            res.status(400).json({message: e.message});
+            res.status(400).json(e.message);
         }
     },
 
     async verifyTwoFactorAuth(req, res) {
         try {
-            const { email, code} = req.body;
+            const { code } = req.body;
 
-            const verify = await TwoFactorAuth.findOne({email: email, code: code})
+            const token = req.headers.token
+
+            const info = jwt.verify(token, config.Token_key, {},(err, info) => {
+                if (err)  {
+                    throw new Error('wrong token')
+                }
+                return info
+            })
+
+            const verify = await TwoFactorAuth.findOne({email: info.userInfo.email, code: code})
 
             if (!verify) {
                 throw new Error('not valid code')
             }
 
-            res.status(201).json({ message: 'Verify is complete' });
+            const tokens = tokenGenerator.generateAccessAndRefreshToken({userId: info.userInfo.userId})
+
+            res.status(201).json({ message: 'Verify is complete', tokens });
         } catch (e) {
             res.status(400).json(e.message);
+        }
+    },
+
+    async checkRefreshToken(req, res) {
+        try {
+            const tokens = JSON.parse(req.headers.tokens);
+            const refresh_token = tokens.refresh_token
+
+            const info = jwt.verify(refresh_token, config.Refresh_Key, {},(err, info) => {
+                if (err)  {
+                    throw new Error('wrong token')
+                }
+                return info
+            })
+
+            const newTokens = tokenGenerator.generateAccessAndRefreshToken({userId: info.userInfo.userId})
+
+            res.status(201).json({ message: 'Verify is complete', tokens: newTokens });
+
+        } catch (e) {
+            res.status(401).json(e.message);
         }
     }
 };
