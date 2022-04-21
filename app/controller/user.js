@@ -3,7 +3,7 @@ const User = require('../models/User');
 module.exports = {
     async getUserInfo(req, res) {
         try {
-            const { userId } = req.query;
+            const { userId } = req.params;
 
             const user = await User.findOne({ _id: userId });
 
@@ -15,16 +15,15 @@ module.exports = {
     async getUsers(req, res) {
         try {
             const {name, surname}  = req.query
-
             let users
             if ((name && surname) !== '') {
-                 users = await User.find({name: name, surname: surname});
+                 users = await User.find({name: name, surname: surname, _id: {$ne: req.info.userId}});
             }else if (name !== '' && surname === '') {
-                 users = await User.find({name: name});
+                 users = await User.find({name: name, _id: {$ne: req.info.userId}});
             } else if (surname !== '' && name === '') {
-                 users = await User.find({surname: surname});
+                 users = await User.find({surname: surname, _id: {$ne: req.info.userId}});
             }
-            res.status(201).json({ users: users});
+            res.status(201).json({ status: 'success', users: users});
         } catch (e) {
             res.json(e.message);
         }
