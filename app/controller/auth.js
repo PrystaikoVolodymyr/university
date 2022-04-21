@@ -9,7 +9,7 @@ const config = require('config');
 module.exports = {
     async singUp(req, res) {
         try {
-            const { email, password, name, surname } = req.body;
+            const { email, password, name, surname, phone } = req.body;
             const user = await User.findOne({ email });
             if (user) {
                 return res.status(400).json({ message: 'User is already exist' });
@@ -20,11 +20,13 @@ module.exports = {
                 email,
                 password: hashPassword,
                 name,
-                surname
+                surname,
+                phone
             });
 
             res.status(201).json({ message: 'User is created' });
         } catch (e) {
+            console.log(e.message)
             res.status(500).json(e.message);
         }
     },

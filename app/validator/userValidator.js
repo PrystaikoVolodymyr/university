@@ -8,6 +8,18 @@ module.exports = {
             .min(3)
             .max(60)
             .required(),
+        surname: Joi
+            .string()
+            .alphanum()
+            .min(3)
+            .max(60)
+            .required(),
+        phone: Joi
+            .string()
+            .alphanum()
+            .min(3)
+            .max(60)
+            .required(),
         email: Joi
             .string()
             .required()
