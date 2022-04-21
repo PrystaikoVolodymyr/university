@@ -15,7 +15,7 @@ module.exports = {
                 return info
             })
 
-            req.info = info
+            req.info = info.userInfo
             await next();
         } catch (err) {
             res.status(401).json(err.message);
