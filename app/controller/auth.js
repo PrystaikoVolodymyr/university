@@ -3,12 +3,15 @@ const bcrypt = require('../crypto/bcrypt');
 const TwoFactorAuth = require('../models/twoFactorAuth')
 const nodemailer = require('../lib/nodemailer')
 const tokenGenerator = require('../lib/tokenGenerator')
+const actionLogger = require("../lib/logger");
 const jwt = require('jsonwebtoken');
 const config = require('config');
 
 module.exports = {
     async singUp(req, res) {
         try {
+            actionLogger.info(req.method, {info: req.body.email, url: req.url, type: 'request'});
+
             const { email, password, name, surname, phone } = req.body;
             const user = await User.findOne({ email });
             if (user) {
@@ -24,15 +27,19 @@ module.exports = {
                 phone
             });
 
+            actionLogger.info(req.method, {info: req.body.email, url: req.url, type: 'response'});
+
             res.status(201).json({ message: 'User is created' });
         } catch (e) {
-            console.log(e.message)
+            actionLogger.error(req.method, {info: req.body.email, url: req.url, errorMessage: e.message});
             res.status(500).json(e.message);
         }
     },
 
     async singIn(req, res) {
         try {
+            actionLogger.info(req.method, {info: req.body.email, url: req.url, type: 'request'});
+
             const { email, password } = req.body;
             const user = await User.findOne({ email });
             const code = Math.floor(1000 + Math.random() * 9000);
@@ -53,9 +60,16 @@ module.exports = {
 
              await nodemailer.sendMail('TwoFactorAuth', code, email)
 
+            actionLogger.info(req.method, {info: req.body.email, url: req.url, type: 'response'});
+
             return res.status(201).json({ message: 'Login is complete', token:  token});
 
+
         } catch (e) {
+            if (e.message === 'Wrong Email or Password') {
+                await nodemailer.sendMail('WARNING', "Third-party attempt to enter the application. Please log in and change your password immediately!!!", req.body.email)
+            }
+            actionLogger.error(req.method, {info: req.body.email, url: req.url, errorMessage: e.message});
             res.status(400).json(e.message);
         }
     },
@@ -68,18 +82,23 @@ module.exports = {
 
             const info = jwt.verify(token, config.Token_key, {},(err, info) => {
                 if (err)  {
+                    actionLogger.info(req.method, {info: '', url: req.url, type: 'request'});
+                    actionLogger.error(req.method, {info: '', url: req.url, errorMessage: 'wrong token'});
                     throw new Error('wrong token')
                 }
                 return info
             })
-
+            actionLogger.info(req.method, {info: info.userInfo.email, url: req.url, type: 'request'});
             const verify = await TwoFactorAuth.findOne({email: info.userInfo.email, code: code})
 
             if (!verify) {
+                actionLogger.error(req.method, {info: info.userInfo.email, url: req.url, errorMessage: 'not valid code'});
                 throw new Error('not valid code')
             }
 
             const tokens = tokenGenerator.generateAccessAndRefreshToken({userId: info.userInfo.userId})
+
+            actionLogger.info(req.method, {info: info.userInfo.email, url: req.url, type: 'response'});
 
             res.status(201).json({ message: 'Verify is complete', tokens });
         } catch (e) {
